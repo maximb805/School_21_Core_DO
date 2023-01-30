@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo -e "$1$2HOSTNAME        =$5$3$4 $(hostname)$5"
+echo -e "$1$2TIMEZONE        =$5$3$4 $(timedatectl | grep "Time zone" | sed 's/.*Time zone: //')$5"
+echo -e "$1$2USER            =$5$3$4 $(whoami)$5"
+echo -e "$1$2OS              =$5$3$4 $(hostnamectl | grep "Operating System" | sed 's/.*Operating System: //')$5"
+echo -e "$1$2DATE            =$5$3$4 $(date +"%d %b %Y %H:%M:%S")$5"
+echo -e "$1$2UPTIME          =$5$3$4 $(uptime -p)$5"
+echo -e "$1$2UPTIME_SEC      =$5$3$4 $(awk '{print $1}' /proc/uptime)$5"
+echo -e "$1$2IP              =$5$3$4 $(ip a | grep "inet " | grep -v " lo" | sed -n '1'p | sed -r 's/\/.+//' | awk '{print $2}')$5"
+echo -e "$1$2MASK            =$5$3$4 $(./get_mask.sh)$5"
+echo -e "$1$2GATEWAY         =$5$3$4 $(ip r | grep "default via" | awk '{print $3}')$5"
+echo -e "$1$2RAM_TOTAL       =$5$3$4 $(free | grep Mem | awk '{printf "%.3f Gb", $2 / 1048576}')$5"
+echo -e "$1$2RAM_USED        =$5$3$4 $(free | grep Mem | awk '{printf "%.3f Gb", $3 / 1048576}')$5"
+echo -e "$1$2RAM_FREE        =$5$3$4 $(free | grep Mem | awk '{printf "%.3f Gb", $4 / 1048576}')$5"
+echo -e "$1$2SPACE_ROOT      =$5$3$4 $(df |grep "/$" | awk '{printf "%.2f Gb", $2 / 1048576}')$5"
+echo -e "$1$2SPACE_ROOT_USED =$5$3$4 $(df | grep "/$" | awk '{printf "%.2f Gb", $3 / 1048576}')$5"
+echo -e "$1$2SPACE_ROOT_FREE =$5$3$4 $(df | grep "/$" | awk '{printf "%.2f Gb", $4 / 1048576}')$5"
