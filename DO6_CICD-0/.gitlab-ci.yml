@@ -1,0 +1,127 @@
+stages:
+  - build
+  - style
+  - test
+  - notify
+  - deploy
+
+variables:
+  TEST_DIR: ./src/tests
+
+build_code_cat:
+  stage: build
+  tags:
+    - build
+  script:
+    - chmod +x $TEST_DIR/build.sh
+    - $TEST_DIR/build.sh cat
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_build_cat.txt
+      - ./artifacts/s21_cat
+    expire_in: 30 days
+
+build_code_grep:
+  stage: build
+  tags:
+    - build
+  script:
+    - chmod +x $TEST_DIR/build.sh
+    - $TEST_DIR/build.sh grep
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_build_grep.txt
+      - ./artifacts/s21_grep
+    expire_in: 30 days
+
+style_code_cat:
+  stage: style
+  tags:
+    - style
+  script:
+    - chmod +x $TEST_DIR/style_test.sh
+    - $TEST_DIR/style_test.sh cat
+  when: always
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_style_cat.txt
+    expire_in: 30 days
+
+style_code_grep:
+  stage: style
+  tags:
+    - style
+  script:
+    - chmod +x $TEST_DIR/style_test.sh
+    - $TEST_DIR/style_test.sh grep
+  when: always
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_style_grep.txt
+    expire_in: 30 days
+
+test_code_cat:
+  stage: test
+  tags:
+    - test
+  script:
+    - chmod +x $TEST_DIR/test_s21_cat.sh
+    - chmod +x $TEST_DIR/check_result.sh
+    - $TEST_DIR/test_s21_cat.sh > $TEST_DIR/result.txt
+    - $TEST_DIR/check_result.sh cat
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_test_cat.txt
+    expire_in: 30 days
+
+test_code_grep:
+  stage: test
+  tags:
+    - test
+  script:
+    - chmod +x $TEST_DIR/test_s21_grep.sh
+    - chmod +x $TEST_DIR/check_result.sh
+    - $TEST_DIR/test_s21_grep.sh > $TEST_DIR/result.txt
+    - $TEST_DIR/check_result.sh grep
+  artifacts:
+    when: always
+    paths:
+      - $TEST_DIR/message_test_grep.txt
+    expire_in: 30 days
+
+notify_on_success:
+  stage: notify
+  tags:
+    - notify
+  script:
+    - chmod +x $TEST_DIR/notify.sh
+    - $TEST_DIR/notify.sh
+  when: on_success
+
+notify_on_fail:
+  stage: notify
+  tags:
+    - notify
+  script:
+    - chmod +x $TEST_DIR/notify.sh
+    - $TEST_DIR/notify.sh
+  when: on_failure
+
+deploy:
+  stage: deploy
+  tags:
+    - deploy
+  script:
+    - chmod +x $TEST_DIR/cp_arts.sh
+    - $TEST_DIR/cp_arts.sh
+  when: manual
+  allow_failure: false
+  after_script:
+    - chmod +x $TEST_DIR/call_bot.sh
+    - $TEST_DIR/call_bot.sh
+    - rm $TEST_DIR/message*
